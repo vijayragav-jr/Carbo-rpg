@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARBON RPG — The Ephemeral Ecosystem</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <style>
+        :root {
+            --bg-deep: #0a0f0d;
+            --bg-mid: #111a14;
+            --bg-card: #162018;
+            --bg-card2: #1a2a1e;
+            --border: #2a3d2e;
+            --border-glow: #3d6645;
+            --text-primary: #d4e8d0;
+            --text-secondary: #7a9e80;
+            --text-muted: #4a6650;
+            --accent-green: #4eca6e;
+            --accent-gold: #d4a843;
+            --accent-blue: #4ab8ca;
+            --accent-red: #ca5a4e;
+            --accent-purple: #9b72ca;
+            --glow-green: rgba(78, 202, 110, 0.15);
+            --glow-gold: rgba(212, 168, 67, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: #0a0f0d;
+            overflow: hidden;
+        }
+
+        #root {
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-6px)
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                opacity: 0.6
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        @keyframes spin-slow {
+            from {
+                transform: rotate(0deg)
+            }
+
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        @keyframes spin-turbine {
+            from {
+                transform-origin: center;
+                transform: rotate(0deg)
+            }
+
+            to {
+                transform-origin: center;
+                transform: rotate(360deg)
+            }
+        }
+
+        @keyframes bloom {
+            0% {
+                transform: scale(0) rotate(-20deg);
+                opacity: 0
+            }
+
+            60% {
+                transform: scale(1.2) rotate(5deg)
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1
+            }
+        }
+
+        @keyframes stream-flow {
+            0% {
+                stroke-dashoffset: 200
+            }
+
+            100% {
+                stroke-dashoffset: 0
+            }
+        }
+
+        @keyframes mote-rise {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0.9
+            }
+
+            100% {
+                transform: translateY(-40px) scale(0);
+                opacity: 0
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% center
+            }
+
+            100% {
+                background-position: -200% center
+            }
+        }
+
+        @keyframes debt-pulse {
+
+            0%,
+            100% {
+                opacity: 0.18
+            }
+
+            50% {
+                opacity: 0.32
+            }
+        }
+
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0)
+            }
+        }
+
+        @keyframes xp-fill {
+            from {
+                width: 0%
+            }
+
+            to {
+                width: var(--xp-pct)
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0);
+                opacity: 0.6
+            }
+
+            100% {
+                transform: scale(3);
+                opacity: 0
+            }
+        }
+
+        @keyframes blink-star {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(0.8)
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2)
+            }
+        }
+
+        .app-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--bg-deep);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Lato', sans-serif;
+        }
+
+        .header {
+            padding: 12px 16px 8px;
+            background: linear-gradient(180deg, rgba(10, 15, 13, 0.98) 0%, rgba(10, 15, 13, 0.9) 100%);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .header-title {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .streak-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: rgba(212, 168, 67, 0.12);
+            padding: 3px 8px;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 168, 67, 0.25);
+        }
+
+        .karma-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-purple);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: rgba(155, 114, 202, 0.12);
+            padding: 3px 8px;
+            border-radius: 20px;
+            border: 1px solid rgba(155, 114, 202, 0.25);
+        }
+
+        .scan-btn {
+            background: rgba(78, 202, 110, 0.12);
+            border: 1px solid rgba(78, 202, 110, 0.3);
+            color: var(--accent-green);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .scan-btn:hover {
+            background: rgba(78, 202, 110, 0.22);
+        }
+
+        .xp-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-badge {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-green);
+            white-space: nowrap;
+            background: var(--glow-green);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(78, 202, 110, 0.3);
+        }
+
+        .xp-bar-bg {
+            flex: 1;
+            height: 6px;
+            background: #1a2a1e;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #2a8c4e, #4eca6e, #8aeea8);
+            background-size: 200% 100%;
+            animation: shimmer 2s linear infinite;
+            transition: width 0.8s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .xp-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 70px;
+        }
+
+        .tab-content::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .tab-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: rgba(10, 15, 13, 0.97);
+            border-top: 1px solid var(--border);
+            display: flex;
+            backdrop-filter: blur(20px);
+            z-index: 20;
+        }
+
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 4px 14px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font-family: 'Lato', sans-serif;
+            transition: all 0.25s;
+            position: relative;
+        }
+
+        .nav-btn.active {
+            color: var(--accent-green);
+        }
+
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: var(--accent-green);
+            border-radius: 2px 2px 0 0;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .nav-btn span:first-child {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        .nav-btn span:last-child {
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* ECOSYSTEM */
+        .ecosystem-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+        }
+
+        .eco-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .eco-score-overlay {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 15, 13, 0.8);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 4px 16px;
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            color: var(--accent-green);
+            letter-spacing: 2px;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .eco-state-name {
+            color: var(--text-muted);
+            font-size: 9px;
+            letter-spacing: 3px;
+        }
+
+        /* HOME CARDS */
+        .home-section {
+            padding: 16px;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--border-glow);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-name {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stat-icon {
+            font-size: 16px;
+        }
+
+        .stat-value {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .stat-bar-bg {
+            height: 4px;
+            background: #1a2a1e;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.8s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .class-badge {
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .class-icon {
+            font-size: 32px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .class-info {
+            flex: 1;
+        }
+
+        .class-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .class-name {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        .class-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        .tale-btn {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(26, 42, 30, 0.8), rgba(22, 32, 24, 0.8));
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 14px;
+            color: var(--text-secondary);
+            font-family: 'Lato', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+        .tale-btn:hover {
+            color: var(--accent-gold);
+            border-color: rgba(212, 168, 67, 0.4);
+            background: rgba(212, 168, 67, 0.06);
+        }
+
+        /* LOG SCREEN */
+        .log-cards {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .log-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .log-card:hover {
+            border-color: var(--border-glow);
+        }
+
+        .log-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .log-stat-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-stat-icon {
+            font-size: 24px;
+        }
+
+        .log-stat-name {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .log-stat-val {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .log-stat-current {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .log-primary-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Lato', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .log-primary-btn::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.4s;
+        }
+
+        .log-primary-btn:active::after {
+            animation: ripple 0.4s ease-out;
+        }
+
+        .log-secondary-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid rgba(202, 90, 78, 0.2);
+            color: rgba(202, 90, 78, 0.7);
+            font-family: 'Lato', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.5px;
+        }
+
+        .log-secondary-btn:hover {
+            border-color: rgba(202, 90, 78, 0.5);
+            color: var(--accent-red);
+            background: rgba(202, 90, 78, 0.05);
+        }
+
+        /* LEADERBOARD */
+        .leaderboard-wrap {
+            padding: 16px;
+        }
+
+        .lb-filter {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .lb-filter-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-family: 'Lato', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .lb-filter-btn.active {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: var(--glow-green);
+        }
+
+        .lb-entry {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .lb-entry.is-user {
+            border-color: var(--border-glow);
+            background: var(--bg-card2);
+        }
+
+        .lb-rank {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 28px;
+        }
+
+        .lb-rank.gold {
+            color: var(--accent-gold);
+        }
+
+        .lb-rank.silver {
+            color: #c0c0c0;
+        }
+
+        .lb-rank.bronze {
+            color: #cd7f32;
+        }
+
+        .lb-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: var(--bg-mid);
+            border: 1px solid var(--border);
+        }
+
+        .lb-info {
+            flex: 1;
+        }
+
+        .lb-name {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .lb-class {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .lb-score {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            color: var(--accent-green);
+        }
+
+        .lb-trust {
+            font-size: 14px;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            animation: fadeInUp 0.2s ease;
+        }
+
+        .modal-box {
+            background: var(--bg-mid);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 60px rgba(78, 202, 110, 0.1);
+            animation: fadeInUp 0.3s cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        .modal-title {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .modal-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+            border-color: var(--border-glow);
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card2);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-size: 13px;
+            color: var(--text-primary);
+            z-index: 200;
+            white-space: nowrap;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            animation: toast-in 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* QR mock */
+        .qr-mock {
+            width: 120px;
+            height: 120px;
+            margin: 16px auto;
+            background: repeating-conic-gradient(var(--bg-card) 0% 25%, var(--accent-green) 0% 50%) 0 0/8px 8px;
+            border: 3px solid var(--accent-green);
+            border-radius: 8px;
+            opacity: 0.8;
+        }
+
+        /* ANALYZING */
+        .analyzing-bar {
+            width: 100%;
+            height: 3px;
+            background: var(--bg-card);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .analyzing-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            border-radius: 2px;
+            animation: shimmer 1s linear infinite;
+            background-size: 200% 100%;
+            width: 60%;
+            animation: analyzing-move 2s ease-in-out forwards;
+        }
+
+        @keyframes analyzing-move {
+            0% {
+                width: 5%
+            }
+
+            70% {
+                width: 85%
+            }
+
+            100% {
+                width: 100%
+            }
+        }
+
+        /* TALE MODAL */
+        .tale-bg {
+            background: linear-gradient(135deg, #0d1f12, #102018, #0d1a15);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tale-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(78, 202, 110, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(74, 184, 202, 0.06) 0%, transparent 60%);
+        }
+
+        .tale-text {
+            font-family: 'Lato', sans-serif;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            position: relative;
+            font-style: italic;
+            letter-spacing: 0.3px;
+        }
+
+        .tale-highlight {
+            color: var(--accent-green);
+            font-style: normal;
+            font-weight: 700;
+        }
+
+        /* DEBT SHADOW */
+        .debt-shadow {
+            animation: debt-pulse 3s ease-in-out infinite;
+        }
+
+        /* WITNESS SUCCESS */
+        .witness-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .witness-btn {
+            width: 100%;
+            padding: 11px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #1a3d28, #2a5a3e);
+            border: 1px solid rgba(78, 202, 110, 0.3);
+            color: var(--accent-green);
+            font-family: 'Lato', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .witness-btn:hover {
+            background: linear-gradient(135deg, #1f4a30, #326b4a);
+        }
+
+        .simulate-witness-btn {
+            width: 100%;
+            padding: 9px;
+            border-radius: 8px;
+            border: 1px dashed var(--border-glow);
+            background: transparent;
+            color: var(--text-muted);
+            font-family: 'Lato', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: all 0.2s;
+        }
+
+        .simulate-witness-btn:hover {
+            color: var(--text-secondary);
+            border-color: var(--text-muted);
+        }
+
+        /* MOTES */
+        .mote {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            animation: mote-rise 2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        /* File upload */
+        .file-upload-area {
+            border: 1.5px dashed var(--border-glow);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            background: rgba(78, 202, 110, 0.03);
+        }
+
+        .file-upload-area:hover {
+            background: rgba(78, 202, 110, 0.06);
+        }
+
+        .file-upload-area input {
+            display: none;
+        }
+
+        /* STARS */
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            animation: blink-star 3s ease-in-out infinite;
+        }
+
+        /* ── DESKTOP MODE (PREMIUM LAYOUT) ── */
+        .app-shell.desktop-mode {
+            max-width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: auto 1fr;
+            grid-template-areas:
+                "nav header"
+                "nav content";
+            background: #0a0f0d;
+        }
+
+        .app-shell.desktop-mode .header {
+            grid-area: header;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: transparent;
+            backdrop-filter: none;
+        }
+
+        .app-shell.desktop-mode .header-title {
+            font-size: 18px;
+            letter-spacing: 4px;
+        }
+
+        .app-shell.desktop-mode .streak-badge,
+        .app-shell.desktop-mode .karma-badge {
+            padding: 6px 14px;
+            font-size: 14px;
+        }
+
+        .app-shell.desktop-mode .scan-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .app-shell.desktop-mode .bottom-nav {
+            grid-area: nav;
+            position: static;
+            transform: none;
+            width: 100%;
+            max-width: none;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 40px;
+            border-top: none;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            background: #101612;
+            box-shadow: 2px 0 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .app-shell.desktop-mode .nav-btn {
+            flex: none;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 20px 30px;
+            margin: 8px 24px;
+            border-radius: 16px;
+            gap: 20px;
+            height: auto;
+        }
+
+        .app-shell.desktop-mode .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .app-shell.desktop-mode .nav-btn.active {
+            background: rgba(78, 202, 110, 0.08);
+            border: 1px solid rgba(78, 202, 110, 0.2);
+        }
+
+        .app-shell.desktop-mode .nav-btn.active::after {
+            display: none;
+        }
+
+        .app-shell.desktop-mode .nav-btn span:first-child {
+            font-size: 26px;
+            margin-bottom: 0;
+        }
+
+        .app-shell.desktop-mode .nav-btn span:last-child {
+            font-size: 14px;
+            letter-spacing: 2.5px;
+        }
+
+        .app-shell.desktop-mode .tab-content {
+            grid-area: content;
+            padding-bottom: 0;
+        }
+
+        /* Home Split-Pane Layout */
+        .app-shell.desktop-mode .tab-content.home-view {
+            display: grid;
+            grid-template-columns: 1fr 440px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .app-shell.desktop-mode .ecosystem-wrap {
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            height: 100%;
+            aspect-ratio: unset;
+            background: #050806;
+        }
+
+        .app-shell.desktop-mode .eco-svg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .app-shell.desktop-mode .eco-score-overlay {
+            bottom: 50px;
+            padding: 14px 34px;
+            font-size: 20px;
+            border-radius: 40px;
+            backdrop-filter: blur(12px);
+        }
+
+        .app-shell.desktop-mode .eco-state-name {
+            font-size: 13px;
+            letter-spacing: 4px;
+        }
+
+        .app-shell.desktop-mode .home-section {
+            background: #0d120f;
+            padding: 40px 32px;
+            overflow-y: auto;
+            height: 100%;
+            box-shadow: inset 10px 0 40px rgba(0, 0, 0, 0.3);
+            border-left: 1px solid black;
+        }
+
+        /* Component Refinements for Desktop */
+        .app-shell.desktop-mode .class-badge {
+            padding: 30px;
+            gap: 24px;
+            margin-bottom: 24px;
+            border-radius: 16px;
+            background: rgba(26, 42, 30, 0.4);
+        }
+
+        .app-shell.desktop-mode .class-icon {
+            font-size: 48px;
+        }
+
+        .app-shell.desktop-mode .class-label {
+            font-size: 12px;
+        }
+
+        .app-shell.desktop-mode .class-name {
+            font-size: 24px;
+            margin-top: 4px;
+        }
+
+        .app-shell.desktop-mode .class-sub {
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .app-shell.desktop-mode .section-title {
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .app-shell.desktop-mode .stats-grid {
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .app-shell.desktop-mode .stat-card {
+            padding: 22px 20px;
+            border-radius: 16px;
+            background: #131a15;
+        }
+
+        .app-shell.desktop-mode .stat-name {
+            font-size: 12px;
+        }
+
+        .app-shell.desktop-mode .stat-value {
+            font-size: 28px;
+        }
+
+        .app-shell.desktop-mode .tale-btn {
+            padding: 20px;
+            font-size: 15px;
+            border-radius: 16px;
+            margin-top: 24px;
+        }
+
+        /* Log & Leaderboard Grids */
+        .app-shell.desktop-mode .log-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 24px;
+            padding: 40px 60px;
+        }
+
+        .app-shell.desktop-mode .leaderboard-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 60px;
+        }
+
+        .app-shell.desktop-mode .lb-entry {
+            padding: 20px 24px;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .app-shell.desktop-mode .lb-avatar {
+            width: 44px;
+            height: 44px;
+            font-size: 22px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        // ── CONSTANTS ─────────────────────────────────────────────────────────────
+        const STAT_CONFIGS = {
+            agility: { label: 'Agility', icon: '🏃', color: '#4eca6e', colorDark: '#2a8c4e', description: 'Movement & Transport', primary: '🚶 Log Walk / Cycle', secondary: '...or took a car / flight?', requiresImage: false },
+            vitality: { label: 'Vitality', icon: '🌿', color: '#82ca6e', colorDark: '#4a8c3e', description: 'Food & Nourishment', primary: '🥗 Log Plant-Based Meal', secondary: '...or ate meat / processed food?', requiresImage: true },
+            purity: { label: 'Purity', icon: '💧', color: '#4ab8ca', colorDark: '#2a7a8c', description: 'Waste & Energy', primary: '♻️ Log Recycle / Green Energy', secondary: '...or wasted energy / no recycling?', requiresImage: true },
+            wealth: { label: 'Wealth', icon: '🌱', color: '#d4a843', colorDark: '#8c6a1e', description: 'Consumption & Shopping', primary: '🛒 Log Sustainable Purchase', secondary: '...or bought fast fashion / excess?', requiresImage: false },
+        };
+
+        const ECO_STATES = [
+            { min: 0, max: 19, name: 'The Ashen Expanse', color: '#3a3d3a' },
+            { min: 20, max: 39, name: 'The Sprouting', color: '#2d5c35' },
+            { min: 40, max: 59, name: 'The Flourishing', color: '#3a7a44' },
+            { min: 60, max: 79, name: 'The Verdant Realm', color: '#4a9a58' },
+            { min: 80, max: 100, name: 'The Luminous Sanctuary', color: '#5aba6e' },
+        ];
+
+        const CLASS_DATA = {
+            agility: { name: 'The Ranger', icon: '🏹', desc: 'Swift and untethered, you tread lightly.' },
+            vitality: { name: 'The Cultivator', icon: '🌾', desc: 'Nourished by the earth, you grow deeply.' },
+            purity: { name: 'The Purifier', icon: '🌊', desc: 'Clear as water, you cleanse what is tainted.' },
+            wealth: { name: 'The Merchant of Green', icon: '⚖️', desc: 'Every choice a vote for the world you want.' },
+            default: { name: 'The Ember', icon: '🔥', desc: 'A spark seeking its element.' },
+        };
+
+        const MOCK_LEADERBOARD = [
+            { id: 'u2', name: 'GreenSage', score: 88, trustTier: 'high', class: 'agility', karma: 340 },
+            { id: 'u3', name: 'PureRoot', score: 74, trustTier: 'peer', class: 'purity', karma: 210 },
+            { id: 'u4', name: 'WildHarvest', score: 61, trustTier: 'peer', class: 'vitality', karma: 180 },
+            { id: 'u5', name: 'SilverStream', score: 48, trustTier: 'self', class: 'wealth', karma: 45 },
+            { id: 'u6', name: 'DuskWatcher', score: 22, trustTier: 'self', class: 'agility', karma: 12 },
+        ];
+
+        const TALE_NARRATIVES = {
+            agility: ['Your feet have written a story across the earth this week.', 'Every step was a vote for a greener tomorrow.'],
+            vitality: ['The garden answered your choices with abundance.', 'Each plant-based meal fed the roots of your world.'],
+            purity: ['Clean hands, clear streams—you filtered the world around you.', 'Your discipline turned chaos into clarity.'],
+            wealth: ['Thoughtful hands touched lightly what they held.', 'You chose sufficiency over surplus.'],
+        };
+
+        function uuid() { return Math.random().toString(36).slice(2, 9); }
+        function getEcoState(score) { return ECO_STATES.find(s => score >= s.min && score <= s.max) || ECO_STATES[0]; }
+        function getEcoScore(stats) { return Math.round((stats.agility + stats.vitality + stats.purity + stats.wealth) / 4); }
+        function getHighestStat(stats) { return Object.entries(stats).sort((a, b) => b[1] - a[1])[0][0]; }
+        function getLowestStat(stats) { return Object.entries(stats).sort((a, b) => a[1] - b[1])[0][0]; }
+        function getClass(stats) { const h = getHighestStat(stats); return stats[h] > 35 ? CLASS_DATA[h] : CLASS_DATA.default; }
+        function getTrustIcon(tier) { return tier === 'high' ? '🛡️' : tier === 'peer' ? '👀' : '📝'; }
+        function getLevelFromXP(xp) { return Math.floor(xp / 100) + 1; }
+        function getXPProgress(xp) { return ((xp % 100) / 100) * 100; }
+
+        // ── LOCAL STORAGE ─────────────────────────────────────────────────────────
+        const DEFAULT_PROFILE = {
+            id: 'local_user_1', name: 'EcoWarrior', level: 1, xp: 0, karma: 0, streak: 0,
+            lastLogDate: null, carbonDebt: 20,
+            stats: { agility: 30, vitality: 30, purity: 30, wealth: 30 },
+            class: 'Ember', trustTier: 'self', witnessedCount: 0,
+        };
+
+        function loadProfile() {
+            try { const p = localStorage.getItem('crpg_profile'); return p ? JSON.parse(p) : DEFAULT_PROFILE; }
+            catch { return DEFAULT_PROFILE; }
+        }
+        function saveProfile(p) { localStorage.setItem('crpg_profile', JSON.stringify(p)); }
+        function loadActionLog() {
+            try { const l = localStorage.getItem('crpg_actions'); return l ? JSON.parse(l) : []; }
+            catch { return []; }
+        }
+        function saveActionLog(l) { localStorage.setItem('crpg_actions', JSON.stringify(l)); }
+        function loadPhotoHashes() {
+            try { const h = localStorage.getItem('crpg_hashes'); return h ? JSON.parse(h) : {}; }
+            catch { return {}; }
+        }
+        function savePhotoHashes(h) { localStorage.setItem('crpg_hashes', JSON.stringify(h)); }
+
+        // ── ECOSYSTEM SVG ─────────────────────────────────────────────────────────
+        function Ecosystem({ ecoScore, hasDebt, animKey }) {
+            const state = getEcoState(ecoScore);
+            const level = ECO_STATES.indexOf(state);
+
+            const stars = Array.from({ length: 18 }, (_, i) => ({
+                x: Math.sin(i * 137.5) * 45 + 50, y: Math.cos(i * 97.3) * 30 + 25,
+                r: Math.random() * 1.2 + 0.4, delay: Math.random() * 3
+            }));
+
+            return (
+                <svg viewBox="0 0 400 225" className="eco-svg" key={animKey}>
+                    <defs>
+                        <radialGradient id="sky-grad" cx="50%" cy="0%" r="100%">
+                            <stop offset="0%" stopColor={level >= 4 ? "#0a2028" : level >= 3 ? "#0a1a20" : level >= 2 ? "#0a1820" : level >= 1 ? "#141810" : "#1a1a1a"} />
+                            <stop offset="100%" stopColor={level >= 4 ? "#051510" : level >= 3 ? "#051210" : level >= 2 ? "#050f0a" : "#0a0a0a"} />
+                        </radialGradient>
+                        <radialGradient id="sun-grad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stopColor={level >= 4 ? "#ffe87a" : level >= 2 ? "#ffd060" : "#ffb030"} stopOpacity="0.9" />
+                            <stop offset="100%" stopColor="transparent" />
+                        </radialGradient>
+                        <linearGradient id="ground-grad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={level >= 3 ? "#2a5c30" : level >= 2 ? "#1e4028" : level >= 1 ? "#1a3020" : "#1a1c18"} />
+                            <stop offset="100%" stopColor={level >= 2 ? "#162818" : "#0f1210"} />
+                        </linearGradient>
+                        <linearGradient id="water-grad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#1a5a6e" />
+                            <stop offset="50%" stopColor="#2a8a9e" />
+                            <stop offset="100%" stopColor="#1a5a6e" />
+                        </linearGradient>
+                        <filter id="glow-f">
+                            <feGaussianBlur stdDeviation="2" result="b" />
+                            <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+                        </filter>
+                        <filter id="soft-glow">
+                            <feGaussianBlur stdDeviation="4" result="b" />
+                            <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+                        </filter>
+                    </defs>
+
+                    {/* Sky */}
+                    <rect width="400" height="225" fill="url(#sky-grad)" />
+
+                    {/* Stars (level 2+) */}
+                    {level >= 2 && stars.map((s, i) => (
+                        <circle key={i} cx={s.x * 4} cy={s.y * 1.5} r={s.r} fill="white" opacity="0.5"
+                            style={{ animationDelay: `${s.delay}s` }} className="star" />
+                    ))}
+
+                    {/* Moon/Sun glow */}
+                    {level >= 1 && <circle cx="340" cy="30" r="24" fill="url(#sun-grad)" opacity="0.5" filter="url(#soft-glow)" />}
+                    {level >= 1 && <circle cx="340" cy="30" r="12" fill={level >= 4 ? "#ffe87a" : level >= 2 ? "#ffd060" : "#ffb030"} opacity="0.7" />}
+
+                    {/* Clouds (level 0 = grey overcast) */}
+                    {level === 0 && <>
+                        <ellipse cx="100" cy="55" rx="60" ry="22" fill="#2a2c28" opacity="0.7" />
+                        <ellipse cx="200" cy="45" rx="80" ry="25" fill="#252824" opacity="0.8" />
+                        <ellipse cx="320" cy="60" rx="55" ry="18" fill="#2a2c28" opacity="0.6" />
+                    </>}
+                    {level >= 2 && <>
+                        <ellipse cx="80" cy="50" rx="35" ry="12" fill="rgba(255,255,255,0.04)" />
+                        <ellipse cx="220" cy="42" rx="45" ry="14" fill="rgba(255,255,255,0.03)" />
+                    </>}
+
+                    {/* Ground */}
+                    <path d="M0 155 Q100 145 200 155 Q300 165 400 155 L400 225 L0 225Z" fill="url(#ground-grad)" />
+
+                    {/* Grass detail (level 1+) */}
+                    {level >= 1 && Array.from({ length: 30 }, (_, i) => (
+                        <line key={i} x1={i * 14 + 5} y1="155" x2={i * 14 + (i % 2 ? -3 : 3)} y2={145 - Math.sin(i) * 3}
+                            stroke="#3a7a44" strokeWidth="1.5" opacity="0.7" />
+                    ))}
+                    {level >= 2 && Array.from({ length: 20 }, (_, i) => (
+                        <line key={i} x1={i * 20 + 10} y1="158" x2={i * 20 + (i % 3 - 1) * 4} y2={148 - Math.cos(i) * 4}
+                            stroke="#4a9a58" strokeWidth="1" opacity="0.5" />
+                    ))}
+
+                    {/* Stream (level 2+) */}
+                    {level >= 2 && (
+                        <path d="M30 175 Q80 168 140 172 Q200 176 260 170 Q310 165 370 168"
+                            fill="none" stroke="url(#water-grad)" strokeWidth={level >= 3 ? 8 : 4}
+                            strokeLinecap="round" opacity="0.8"
+                            style={{ animation: 'stream-flow 3s linear infinite', strokeDasharray: 200, strokeDashoffset: 200 }} />
+                    )}
+                    {/* Pond (level 3+) */}
+                    {level >= 3 && (
+                        <ellipse cx="310" cy="178" rx="55" ry="18" fill="#1a6a7e" opacity="0.6" />
+                    )}
+                    {level >= 4 && (
+                        <path d="M340 145 Q342 160 345 178" stroke="#4ab8ca" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.8" />
+                    )}
+
+                    {/* Withered sapling (level 0) */}
+                    {level === 0 && <>
+                        <line x1="200" y1="155" x2="200" y2="110" stroke="#3a3530" strokeWidth="3" />
+                        <line x1="200" y1="130" x2="185" y2="120" stroke="#3a3530" strokeWidth="2" />
+                        <line x1="200" y1="125" x2="215" y2="115" stroke="#3a3530" strokeWidth="2" />
+                    </>}
+
+                    {/* Shoots (level 1) */}
+                    {level >= 1 && [60, 120, 180, 250, 320, 370].map((x, i) => (
+                        <g key={i}>
+                            <line x1={x} y1="155" x2={x + (i % 2 ? -4 : 4)} y2={140} stroke="#3a7a44" strokeWidth="2.5" />
+                            <ellipse cx={x + (i % 2 ? -4 : 4)} cy={138} rx="5" ry="3" fill="#4a9a5a" transform={`rotate(${i * 15},${x + (i % 2 ? -4 : 4)},138)`} />
+                        </g>
+                    ))}
+
+                    {/* Wildflowers (level 2+) */}
+                    {level >= 2 && [
+                        { x: 75, y: 152, c: '#e87a9e', r: 5 }, { x: 155, y: 149, c: '#a87adc', r: 4 }, { x: 225, y: 151, c: '#e8ca5a', r: 5 },
+                        ...(level >= 3 ? [{ x: 290, y: 150, c: '#e87a9e', r: 4 }, { x: 350, y: 152, c: '#5ae87a', r: 5 }] : [])
+                    ].map((f, i) => (
+                        <g key={i} style={{ animation: `bloom 0.6s ${i * 0.1}s ease both` }}>
+                            <line x1={f.x} y1={f.y} x2={f.x} y2={f.y + 16} stroke="#3a7a44" strokeWidth="1.5" />
+                            {[0, 72, 144, 216, 288].map(a => (
+                                <ellipse key={a} cx={f.x + Math.cos(a * Math.PI / 180) * f.r} cy={f.y + Math.sin(a * Math.PI / 180) * f.r}
+                                    rx={f.r - 1} ry={f.r - 1} fill={f.c} opacity="0.85"
+                                    transform={`rotate(${a},${f.x},${f.y})`} />
+                            ))}
+                            <circle cx={f.x} cy={f.y} r="2.5" fill="#ffe87a" />
+                        </g>
+                    ))}
+
+                    {/* Tree (level 3+) */}
+                    {level >= 3 && <>
+                        <rect x="96" y="120" width="8" height="36" fill="#5a3a20" rx="2" />
+                        <circle cx="100" cy="105" r="28" fill="#2a6a3a" opacity="0.9" />
+                        <circle cx="88" cy="115" r="18" fill="#2a7a40" opacity="0.8" />
+                        <circle cx="115" cy="110" r="20" fill="#2a6a38" opacity="0.8" />
+                        {/* Blossoms */}
+                        {level >= 3 && [[-15, -5], [10, -8], [0, 10], [-8, 8]].map(([dx, dy], i) => (
+                            <circle key={i} cx={100 + dx} cy={105 + dy} r="3" fill="#e87aae" opacity="0.7" />
+                        ))}
+                    </>}
+
+                    {/* Full tree + second tree (level 4) */}
+                    {level >= 4 && <>
+                        <rect x="294" y="118" width="6" height="34" fill="#5a3a20" rx="2" />
+                        <circle cx="297" cy="106" r="22" fill="#3a8a4e" opacity="0.85" />
+                        <circle cx="286" cy="114" r="14" fill="#3a9a56" opacity="0.8" />
+                        <circle cx="310" cy="112" r="16" fill="#3a8a4a" opacity="0.8" />
+                    </>}
+
+                    {/* Wind Turbine(s) */}
+                    {level >= 1 && <TurbineGroup x={340} y={100} scale={0.7} speed={level >= 2 ? 2 : 4} />}
+                    {level >= 2 && <TurbineGroup x={50} y={110} scale={0.55} speed={3} />}
+
+                    {/* Animals (level 3+) */}
+                    {level >= 3 && <FoxSVG x={250} y={147} />}
+                    {level >= 4 && <BirdSVG x={130} y={90} />}
+
+                    {/* Bioluminescent plants (level 4) */}
+                    {level >= 4 && [
+                        { x: 170, y: 150, c: '#4aeac0' }, { x: 195, y: 148, c: '#7a9aea' }, { x: 210, y: 151, c: '#ea7aea' },
+                        { x: 380, y: 152, c: '#4aeac0' }, { x: 25, y: 153, c: '#7aea9a' },
+                    ].map((p, i) => (
+                        <g key={i} filter="url(#glow-f)">
+                            <line x1={p.x} y1={p.y} x2={p.x} y2={p.y + 10} stroke={p.c} strokeWidth="1.5" opacity="0.8" />
+                            <circle cx={p.x} cy={p.y} r="4" fill={p.c} opacity="0.7" />
+                        </g>
+                    ))}
+
+                    {/* Golden motes (level 4) */}
+                    {level >= 4 && Array.from({ length: 8 }, (_, i) => (
+                        <circle key={i} cx={40 + i * 45} cy={130 - i * 8} r="2" fill="#d4a843" opacity="0.8"
+                            filter="url(#glow-f)"
+                            style={{ animation: `mote-rise ${1.5 + i * 0.3}s ${i * 0.4}s ease-out infinite` }} />
+                    ))}
+
+                    {/* Carbon Debt shadow overlay */}
+                    {hasDebt && (
+                        <rect width="400" height="225" fill="#1a1a1a" opacity="0.28"
+                            className="debt-shadow"
+                            style={{ mixBlendMode: 'multiply' }} />
+                    )}
+                    {hasDebt && (
+                        <path d="M-10 120 Q100 100 200 115 Q300 130 410 110 L410 230 L-10 230Z"
+                            fill="#2a2a2a" opacity="0.22" className="debt-shadow" />
+                    )}
+                </svg>
+            );
+        }
+
+        function TurbineGroup({ x, y, scale, speed }) {
+            const s = scale;
+            return (
+                <g transform={`translate(${x},${y}) scale(${s})`}>
+                    <line x1="0" y1="0" x2="0" y2="50" stroke="#6a7a6e" strokeWidth="3" />
+                    <g style={{ transformOrigin: `${x}px ${y}px`, animation: `spin-turbine ${speed}s linear infinite` }}
+                        transform={`rotate(0,0,0)`}>
+                        {[0, 120, 240].map(a => (
+                            <ellipse key={a} cx={Math.cos((a - 90) * Math.PI / 180) * 18} cy={Math.sin((a - 90) * Math.PI / 180) * 18}
+                                rx="14" ry="4" fill="#8aaa8e" opacity="0.8"
+                                transform={`rotate(${a},0,0)`} />
+                        ))}
+                        <circle cx="0" cy="0" r="4" fill="#5a7a5e" />
+                    </g>
+                </g>
+            );
+        }
+
+        function FoxSVG({ x, y }) {
+            return (
+                <g transform={`translate(${x},${y})`} style={{ animation: 'float 4s 1s ease-in-out infinite' }}>
+                    <ellipse cx="0" cy="-4" rx="10" ry="6" fill="#c86030" />
+                    <polygon points="-4,-10 -7,-18 -1,-10" fill="#c86030" />
+                    <polygon points="4,-10 7,-18 1,-10" fill="#c86030" />
+                    <ellipse cx="0" cy="-4" rx="4" ry="3" fill="#e8a070" opacity="0.8" />
+                    <circle cx="-3" cy="-6" r="1.2" fill="#1a1a18" />
+                    <circle cx="3" cy="-6" r="1.2" fill="#1a1a18" />
+                    <circle cx="-2.5" cy="-5.5" r="0.5" fill="white" />
+                    <circle cx="3.5" cy="-5.5" r="0.5" fill="white" />
+                    <path d="M-12 0 Q-5 -2 0 0" stroke="#c86030" strokeWidth="3" strokeLinecap="round" fill="none" />
+                </g>
+            );
+        }
+
+        function BirdSVG({ x, y }) {
+            return (
+                <g transform={`translate(${x},${y})`} style={{ animation: 'float 3s 0.5s ease-in-out infinite' }}>
+                    <path d="M-8 0 Q0 -6 8 0" fill="none" stroke="#4a7a9e" strokeWidth="2.5" strokeLinecap="round" />
+                    <circle cx="8" cy="-1" r="3" fill="#5a8aae" />
+                    <path d="M8 -1 L14 1" stroke="#5a8aae" strokeWidth="1.5" strokeLinecap="round" />
+                </g>
+            );
+        }
+
+        // ── TOAST ─────────────────────────────────────────────────────────────────
+        function Toast({ msg, icon }) {
+            return <div className="toast">{icon || '🌱'} {msg}</div>;
+        }
+
+        // ── HEADER ────────────────────────────────────────────────────────────────
+        function Header({ profile, onScan, isDesktopMode, toggleMode }) {
+            const level = getLevelFromXP(profile.xp);
+            const xpPct = getXPProgress(profile.xp);
+            return (
+                <div className="header">
+                    <div className="header-top">
+                        <div className="header-title">⬡ Carbon RPG</div>
+                        <div className="header-meta">
+                            <div className="streak-badge">🔥 {profile.streak}</div>
+                            <div className="karma-badge">✨ {profile.karma}</div>
+                            <button className="scan-btn" onClick={onScan}>📷 Scan</button>
+                            <button className="scan-btn" onClick={toggleMode} style={{ padding: '4px 6px', fontSize: 13 }} title="Toggle Desktop Mode">
+                                {isDesktopMode ? '📱' : '💻'}
+                            </button>
+                        </div>
+                    </div>
+                    <div className="xp-bar-wrap">
+                        <div className="level-badge">Lv.{level}</div>
+                        <div className="xp-bar-bg">
+                            <div className="xp-bar-fill" style={{ width: `${xpPct}%` }} />
+                        </div>
+                        <div className="xp-label">{profile.xp % 100}/100 XP</div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ── HOME SCREEN ───────────────────────────────────────────────────────────
+        function HomeScreen({ profile, animKey, onTale }) {
+            const stats = profile.stats;
+            const ecoScore = getEcoScore(stats);
+            const ecoState = getEcoState(ecoScore);
+            const cls = getClass(stats);
+
+            const statColors = { agility: '#4eca6e', vitality: '#82ca6e', purity: '#4ab8ca', wealth: '#d4a843' };
+
+            return (
+                <div className="tab-content home-view">
+                    <div className="ecosystem-wrap">
+                        <Ecosystem ecoScore={ecoScore} hasDebt={profile.carbonDebt > 10} animKey={animKey} />
+                        <div className="eco-score-overlay">
+                            <span style={{ color: ecoState.color, fontWeight: 700 }}>{ecoScore}</span>
+                            <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>
+                            <span className="eco-state-name">{ecoState.name.toUpperCase()}</span>
+                        </div>
+                    </div>
+
+                    <div className="home-section">
+                        <div className="class-badge">
+                            <div className="class-icon">{cls.icon}</div>
+                            <div className="class-info">
+                                <div className="class-label">Your Class</div>
+                                <div className="class-name">{cls.name}</div>
+                                <div className="class-sub">{cls.desc}</div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Trust</div>
+                                <div style={{ fontSize: 18 }}>{getTrustIcon(profile.trustTier)}</div>
+                            </div>
+                        </div>
+
+                        <div className="section-title">Vital Signs</div>
+                        <div className="stats-grid">
+                            {Object.entries(stats).map(([key, val]) => {
+                                const cfg = STAT_CONFIGS[key];
+                                return (
+                                    <div className="stat-card" key={key}>
+                                        <div className="stat-header">
+                                            <div className="stat-name">{cfg.label}</div>
+                                            <div className="stat-icon">{cfg.icon}</div>
+                                        </div>
+                                        <div className="stat-value" style={{ color: statColors[key] }}>{val}</div>
+                                        <div className="stat-bar-bg">
+                                            <div className="stat-bar-fill" style={{ width: `${val}%`, background: statColors[key], boxShadow: `0 0 8px ${statColors[key]}40` }} />
+                                        </div>
+                                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{cfg.description}</div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {profile.carbonDebt > 0 && (
+                            <div style={{ background: 'rgba(202,90,78,0.08)', border: '1px solid rgba(202,90,78,0.25)', borderRadius: 12, padding: '12px 14px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <span style={{ fontSize: 20 }}>🌫️</span>
+                                <div>
+                                    <div style={{ fontSize: 12, color: '#ca8a7a', fontWeight: 700 }}>Carbon Debt: {profile.carbonDebt}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Log positive actions to clear the shadow from your sanctuary.</div>
+                                </div>
+                            </div>
+                        )}
+
+                        <button className="tale-btn" onClick={onTale}>
+                            <span>📜</span> Generate This Week's Tale
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // ── LOG SCREEN ────────────────────────────────────────────────────────────
+        function LogScreen({ profile, onLog }) {
+            const [modal, setModal] = useState(null); // {type, step:'upload'|'analyzing'|'success'|'fail'|'witness', xpGained, witnessed}
+            const [toast, setToast] = useState(null);
+            const fileRef = useRef();
+            const [uploadedFile, setUploadedFile] = useState(null);
+            const [scanningQR, setScanningQR] = useState(false);
+
+            const showToast = (msg, icon) => {
+                setToast({ msg, icon });
+                setTimeout(() => setToast(null), 3000);
+            };
+
+            const handlePrimary = (type) => {
+                const cfg = STAT_CONFIGS[type];
+                if (cfg.requiresImage) {
+                    setModal({ type, step: 'upload' });
+                } else {
+                    logAction(type, true);
+                }
+            };
+
+            const handleSecondary = (type) => {
+                logAction(type, false);
+            };
+
+            const logAction = (type, positive) => {
+                const xpGain = positive ? (10 + Math.floor(Math.random() * 6)) : 0;
+                onLog(type, positive, xpGain, null, (result) => {
+                    if (result.toastMsg) showToast(result.toastMsg, result.toastIcon);
+                    else if (positive) setModal({ type, step: 'success', xpGained: result.xpGained, witnessed: false });
+                });
+            };
+
+            const handleFileUpload = (type, file) => {
+                if (!file) return;
+                setUploadedFile(file);
+                setModal({ type, step: 'analyzing' });
+                // Mock AI analysis
+                setTimeout(() => {
+                    const isValid = Math.random() < 0.7;
+                    const hash = `${file.name}_${file.size}_${file.lastModified}`;
+                    const hashes = loadPhotoHashes();
+                    const cat = hashes[type] || [];
+
+                    if (cat.includes(hash)) {
+                        setModal(null);
+                        showToast('This moment\'s energy has already been honored today. Try something new!', '🌱');
+                        return;
+                    }
+
+                    if (isValid) {
+                        // First Discovery bonus
+                        const isFirstDiscovery = !cat.some(h => h.startsWith(file.name));
+                        const newHashes = { ...hashes, [type]: [...cat.slice(-2), hash] };
+                        savePhotoHashes(newHashes);
+                        const xpGain = 12 + (isFirstDiscovery ? 5 : 0) + Math.floor(Math.random() * 5);
+                        onLog(type, true, xpGain, hash, (result) => {
+                            setModal({ type, step: 'success', xpGained: result.xpGained, witnessed: false, firstDiscovery: isFirstDiscovery });
+                        });
+                    } else {
+                        setModal({ type, step: 'fail' });
+                    }
+                }, 2200);
+            };
+
+            const handleSimulateWitness = () => {
+                onLog(modal.type, true, 2, null, () => { });
+                setModal(m => ({ ...m, witnessed: true }));
+                showToast('+10% XP Bonus! You\'ve been witnessed! 👀', '✨');
+            };
+
+            return (
+                <div className="tab-content">
+                    {toast && <Toast msg={toast.msg} icon={toast.icon} />}
+                    <div className="log-cards">
+                        {Object.entries(STAT_CONFIGS).map(([key, cfg]) => {
+                            const val = profile.stats[key];
+                            const color = key === 'agility' ? '#4eca6e' : key === 'vitality' ? '#82ca6e' : key === 'purity' ? '#4ab8ca' : '#d4a843';
+                            return (
+                                <div className="log-card" key={key}>
+                                    <div className="log-card-header">
+                                        <div className="log-stat-info">
+                                            <div className="log-stat-icon">{cfg.icon}</div>
+                                            <div>
+                                                <div className="log-stat-name">{cfg.label}</div>
+                                                <div className="log-stat-val">{cfg.description}</div>
+                                            </div>
+                                        </div>
+                                        <div className="log-stat-current" style={{ color }}>{val}</div>
+                                    </div>
+                                    <div style={{ height: 3, background: '#1a2a1e', borderRadius: 2, marginBottom: 12, overflow: 'hidden' }}>
+                                        <div style={{ width: `${val}%`, height: '100%', background: color, borderRadius: 2, transition: 'width 0.5s', boxShadow: `0 0 6px ${color}60` }} />
+                                    </div>
+                                    <button className="log-primary-btn"
+                                        style={{ background: `linear-gradient(135deg,${color}22,${color}15)`, border: `1px solid ${color}40`, color }}
+                                        onClick={() => handlePrimary(key)}>
+                                        {cfg.primary}
+                                    </button>
+                                    <button className="log-secondary-btn" onClick={() => handleSecondary(key)}>
+                                        {cfg.secondary}
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* MODAL */}
+                    {modal && (
+                        <div className="modal-overlay" onClick={e => { if (e.target.className === 'modal-overlay' && modal.step !== 'analyzing') setModal(null) }}>
+                            <div className="modal-box">
+                                <button className="modal-close" onClick={() => modal.step !== 'analyzing' && setModal(null)}>✕</button>
+
+                                {modal.step === 'upload' && <>
+                                    <div className="modal-title">{STAT_CONFIGS[modal.type].icon} Verify Your Action</div>
+                                    <div className="modal-sub">Upload a photo so our AI can verify your eco-action.</div>
+                                    <div className="file-upload-area" onClick={() => fileRef.current?.click()}>
+                                        <input ref={fileRef} type="file" accept="image/*" onChange={e => handleFileUpload(modal.type, e.target.files[0])} />
+                                        <div style={{ fontSize: 32, marginBottom: 8 }}>📷</div>
+                                        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Tap to upload photo</div>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>JPG, PNG, HEIC · Max 10MB</div>
+                                    </div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginTop: 12 }}>
+                                        🔒 Unique photos earn a +5 First Discovery Bonus
+                                    </div>
+
+                                    <div style={{ marginTop: 16, textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>— OR —</div>
+
+                                    <button className="witness-btn" style={{ marginTop: 12, background: 'transparent', border: '1px dashed var(--accent-green)', color: 'var(--accent-green)' }} onClick={() => setModal(m => ({ ...m, step: 'qr-scanner' }))}>
+                                        🔍 Scan Partner QR Code
+                                    </button>
+                                </>}
+
+                                {modal.step === 'qr-scanner' && <>
+                                    <div className="modal-title">📷 QR Scanner</div>
+                                    <div className="modal-sub">Scan a valid eco-receipt or partner QR code.</div>
+
+                                    <div style={{ border: '2px solid var(--border-glow)', borderRadius: 12, aspectRatio: '1', maxWidth: 200, margin: '16px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 8, color: 'var(--text-muted)', fontSize: 13, background: 'var(--bg-card)' }}>
+                                        {scanningQR ? <>
+                                            <div style={{ fontSize: 28, animation: 'spin-slow 1s linear infinite' }}>🔍</div>
+                                            <div>Scanning...</div>
+                                        </> : <>
+                                            <div style={{ fontSize: 28 }}>📱</div>
+                                            <div>Camera View</div>
+                                        </>}
+                                    </div>
+
+                                    <button className="simulate-witness-btn" onClick={() => {
+                                        setScanningQR(true);
+                                        setTimeout(() => {
+                                            setScanningQR(false);
+                                            const xpGain = 15;
+                                            onLog(modal.type, true, xpGain, null, (result) => {
+                                                if (result.toastMsg) showToast(result.toastMsg, result.toastIcon);
+                                                else setModal({ type: modal.type, step: 'success', xpGained: result.xpGained, witnessed: false, firstDiscovery: false });
+                                            });
+                                        }, 1500);
+                                    }} disabled={scanningQR}>
+                                        {scanningQR ? 'Scanning...' : '🧪 Simulate Scanner (Demo)'}
+                                    </button>
+                                </>}
+
+                                {modal.step === 'analyzing' && <>
+                                    <div className="modal-title">🔬 AI Analyzing...</div>
+                                    <div className="modal-sub">Our model is verifying your eco-action. Just a moment.</div>
+                                    <div style={{ textAlign: 'center', padding: '20px 0', fontSize: 40 }}>🌿</div>
+                                    <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', marginBottom: 8 }}>Checking for plant-based content...</div>
+                                    <div className="analyzing-bar"><div className="analyzing-fill" /></div>
+                                </>}
+
+                                {modal.step === 'success' && <>
+                                    <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
+                                        <div style={{ fontSize: 48, animation: 'bloom 0.5s ease' }}>✅</div>
+                                        <div className="modal-title" style={{ marginTop: 8, textAlign: 'center' }}>Action Logged!</div>
+                                        <div style={{ fontSize: 13, color: 'var(--text-secondary)', textAlign: 'center', marginTop: 4 }}>
+                                            +{modal.xpGained} XP earned
+                                            {modal.firstDiscovery && <span style={{ color: 'var(--accent-gold)' }}> · ⭐ First Discovery +5</span>}
+                                        </div>
+                                    </div>
+                                    <div className="witness-box">
+                                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>Earn +10% bonus XP & boost your Trust Tier</div>
+                                        {!modal.witnessed ? <>
+                                            <button className="witness-btn" onClick={() => setModal(m => ({ ...m, step: 'witness' }))}>
+                                                👥 Ask a Friend to Witness (+10% XP)
+                                            </button>
+                                        </> : (
+                                            <div style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: 13 }}>👀 Action Witnessed! XP Bonus Applied.</div>
+                                        )}
+                                    </div>
+                                    <button className="witness-btn" style={{ marginTop: 12, background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
+                                        onClick={() => setModal(null)}>Done</button>
+                                </>}
+
+                                {modal.step === 'witness' && <>
+                                    <div className="modal-title">👀 Witness QR Code</div>
+                                    <div className="modal-sub">Have a friend scan this with their CARBON RPG app.</div>
+                                    <div className="qr-mock" />
+                                    <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', marginBottom: 12 }}>
+                                        CRPG-{uuid().toUpperCase()}
+                                    </div>
+                                    <button className="simulate-witness-btn" onClick={handleSimulateWitness}>
+                                        🧪 Simulate Friend Witness (Demo)
+                                    </button>
+                                </>}
+
+                                {modal.step === 'fail' && <>
+                                    <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
+                                        <div style={{ fontSize: 48 }}>🌫️</div>
+                                        <div className="modal-title" style={{ textAlign: 'center', marginTop: 8 }}>Couldn't Verify</div>
+                                        <div style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', marginTop: 6, lineHeight: 1.6 }}>
+                                            Our AI couldn't confirm this action from the photo. Try a clearer image, or log it honestly as self-reported.
+                                        </div>
+                                    </div>
+                                    <button className="witness-btn" style={{ marginTop: 16 }} onClick={() => setModal(null)}>Try Again</button>
+                                </>}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // ── LEADERBOARD ───────────────────────────────────────────────────────────
+        function LeaderboardScreen({ profile }) {
+            const [filter, setFilter] = useState('all');
+            const ecoScore = getEcoScore(profile.stats);
+
+            const allUsers = [
+                ...MOCK_LEADERBOARD,
+                { id: 'local_user_1', name: profile.name, score: ecoScore, trustTier: profile.trustTier, class: getHighestStat(profile.stats), karma: profile.karma, isUser: true }
+            ].sort((a, b) => b.score - a.score);
+
+            const filtered = filter === 'high' ? allUsers.filter(u => u.trustTier === 'high') : allUsers;
+
+            const rankColor = (i) => i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+            const classIcon = (cls) => CLASS_DATA[cls]?.icon || '🔥';
+
+            return (
+                <div className="tab-content">
+                    <div className="leaderboard-wrap">
+                        <div style={{ marginBottom: 16 }}>
+                            <div className="section-title">Global Rankings</div>
+                            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Updated in real-time as you log actions.</div>
+                        </div>
+                        <div className="lb-filter">
+                            <button className={`lb-filter-btn${filter === 'all' ? ' active' : ''}`} onClick={() => setFilter('all')}>
+                                🌍 All Players
+                            </button>
+                            <button className={`lb-filter-btn${filter === 'high' ? ' active' : ''}`} onClick={() => setFilter('high')}>
+                                🛡️ High Trust
+                            </button>
+                        </div>
+                        <ol style={{ listStyle: 'none' }}>
+                            {filtered.map((u, i) => (
+                                <li key={u.id} className={`lb-entry${u.isUser ? ' is-user' : ''}`} style={{ animationDelay: `${i * 0.05}s` }}>
+                                    <div className={`lb-rank ${rankColor(i)}`}>#{i + 1}</div>
+                                    <div className="lb-avatar">{classIcon(u.class)}</div>
+                                    <div className="lb-info">
+                                        <div className="lb-name">{u.name}{u.isUser && <span style={{ fontSize: 10, color: 'var(--accent-green)', marginLeft: 6 }}>YOU</span>}</div>
+                                        <div className="lb-class">{CLASS_DATA[u.class]?.name || 'Ember'} · Karma: {u.karma || 0}</div>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+                                        <div className="lb-score">{u.score}</div>
+                                        <div className="lb-trust">{getTrustIcon(u.trustTier)}</div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ol>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textAlign: 'center', marginTop: 16, lineHeight: 1.8, letterSpacing: '0.5px' }}>
+                            🛡️ High Trust (50%+ Witnessed) &nbsp;·&nbsp; 👀 Peer Witnessed &nbsp;·&nbsp; 📝 Self-Reported
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ── TALE MODAL ────────────────────────────────────────────────────────────
+        function TaleModal({ profile, onClose }) {
+            const stats = profile.stats;
+            const high = getHighestStat(stats);
+            const low = getLowestStat(stats);
+            const ecoState = getEcoState(getEcoScore(stats));
+
+            const highNarr = TALE_NARRATIVES[high]?.[Math.floor(Math.random() * 2)] || '';
+            const lowNarr = TALE_NARRATIVES[low]?.[Math.floor(Math.random() * 2)] || '';
+
+            return (
+                <div className="modal-overlay" onClick={e => { if (e.target.className === 'modal-overlay') onClose() }}>
+                    <div className="modal-box">
+                        <button className="modal-close" onClick={onClose}>✕</button>
+                        <div style={{ textAlign: 'center', marginBottom: 4 }}>
+                            <div style={{ fontSize: 36 }}>📜</div>
+                        </div>
+                        <div className="modal-title" style={{ textAlign: 'center' }}>This Week's Tale</div>
+                        <div className="modal-sub" style={{ textAlign: 'center' }}>
+                            A chronicle of your Sanctuary's journey
+                        </div>
+                        <div className="tale-bg">
+                            <div className="tale-text">
+                                This week, your{' '}
+                                <span className="tale-highlight">{STAT_CONFIGS[high].label} {STAT_CONFIGS[high].icon}</span>
+                                {' '}guided you like a north star.{' '}{highNarr}
+                                <br /><br />
+                                Yet, a gentle shadow lingered where your{' '}
+                                <span style={{ color: 'var(--accent-red)' }}>{STAT_CONFIGS[low].label} {STAT_CONFIGS[low].icon}</span>
+                                {' '}waits for deeper attention.{' '}{lowNarr}
+                                <br /><br />
+                                Your Sanctuary's{' '}
+                                <span className="tale-highlight">{ecoState.name}</span>
+                                {' '}reflects this journey — a world both strong and still becoming.
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16, gap: 8 }}>
+                            {Object.entries(stats).map(([k, v]) => (
+                                <div key={k} style={{ flex: 1, textAlign: 'center' }}>
+                                    <div style={{ fontSize: 18 }}>{STAT_CONFIGS[k].icon}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', letterSpacing: 1 }}>{v}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // ── SCAN MODAL ────────────────────────────────────────────────────────────
+        function ScanModal({ onClose, onWitness }) {
+            const [scanning, setScanning] = useState(false);
+            const [result, setResult] = useState(null);
+
+            const handleScan = () => {
+                setScanning(true);
+                setTimeout(() => {
+                    setScanning(false);
+                    setResult({ name: 'GreenSage', action: 'Plant-Based Meal', xpReward: 5 });
+                }, 1800);
+            };
+
+            const handleWitness = () => {
+                onWitness(result.xpReward);
+                onClose();
+            };
+
+            return (
+                <div className="modal-overlay" onClick={e => { if (e.target.className === 'modal-overlay') onClose() }}>
+                    <div className="modal-box">
+                        <button className="modal-close" onClick={onClose}>✕</button>
+                        <div className="modal-title">📷 Witness Scanner</div>
+                        <div className="modal-sub">Scan a friend's QR code to witness their eco-action and earn Karma.</div>
+                        {!result && <>
+                            <div style={{ border: '2px solid var(--border-glow)', borderRadius: 12, aspectRatio: '1', maxWidth: 200, margin: '16px auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 8, color: 'var(--text-muted)', fontSize: 13, background: 'var(--bg-card)' }}>
+                                {scanning ? <>
+                                    <div style={{ fontSize: 28, animation: 'spin-slow 1s linear infinite' }}>🔍</div>
+                                    <div>Scanning...</div>
+                                </> : <>
+                                    <div style={{ fontSize: 28 }}>📱</div>
+                                    <div>Camera View</div>
+                                </>}
+                            </div>
+                            <button className="witness-btn" onClick={handleScan} disabled={scanning}>
+                                {scanning ? 'Scanning...' : '🔍 Simulate QR Scan'}
+                            </button>
+                        </>}
+                        {result && <>
+                            <div style={{ background: 'var(--glow-green)', border: '1px solid var(--border-glow)', borderRadius: 12, padding: 16, textAlign: 'center', margin: '12px 0' }}>
+                                <div style={{ fontSize: 24 }}>👀</div>
+                                <div style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 700, marginTop: 6 }}>Witness @{result.name}'s</div>
+                                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{result.action}</div>
+                                <div style={{ fontSize: 11, color: 'var(--accent-gold)', marginTop: 6 }}>+{result.xpReward} Karma for you</div>
+                            </div>
+                            <button className="witness-btn" onClick={handleWitness}>✅ Confirm Witness</button>
+                        </>}
+                    </div>
+                </div>
+            );
+        }
+
+        // ── MAIN APP ──────────────────────────────────────────────────────────────
+        function App() {
+            const [profile, setProfile] = useState(loadProfile);
+            const [tab, setTab] = useState('home');
+            const [ecoAnimKey, setEcoAnimKey] = useState(0);
+            const [showTale, setShowTale] = useState(false);
+            const [showScan, setShowScan] = useState(false);
+            const [toast, setToast] = useState(null);
+            const [isDesktopMode, setIsDesktopMode] = useState(false);
+
+            // Streak logic on load
+            useEffect(() => {
+                const p = loadProfile();
+                const now = new Date();
+                if (p.lastLogDate) {
+                    const last = new Date(p.lastLogDate);
+                    const diffDays = Math.floor((now - last) / 86400000);
+                    if (diffDays > 1) {
+                        p.streak = 0;
+                        p.stats = { agility: Math.max(0, p.stats.agility - 2), vitality: Math.max(0, p.stats.vitality - 2), purity: Math.max(0, p.stats.purity - 2), wealth: Math.max(0, p.stats.wealth - 2) };
+                        setProfile({ ...p });
+                        saveProfile(p);
+                        showToastMsg('Stat decay applied — log today to prevent further withering.', '🌫️');
+                    }
+                }
+            }, []);
+
+            const showToastMsg = (msg, icon) => {
+                setToast({ msg, icon });
+                setTimeout(() => setToast(null), 3500);
+            };
+
+            const handleLog = useCallback((type, positive, xpGain, photoHash, callback) => {
+                setProfile(prev => {
+                    const now = new Date().toISOString().split('T')[0];
+                    const newStats = { ...prev.stats };
+                    let newDebt = prev.carbonDebt;
+
+                    if (positive) {
+                        newStats[type] = Math.min(100, newStats[type] + (type === 'agility' ? 8 : type === 'wealth' ? 6 : 10));
+                        newDebt = Math.max(0, newDebt - 5);
+                    } else {
+                        newStats[type] = Math.max(0, newStats[type] - 12);
+                        newDebt = Math.min(100, newDebt + 10);
+                    }
+
+                    // Check streak
+                    let newStreak = prev.streak;
+                    const lastLog = prev.lastLogDate;
+                    if (lastLog !== now) {
+                        const last = lastLog ? new Date(lastLog) : null;
+                        const today = new Date(now);
+                        const diffDays = last ? Math.floor((today - last) / 86400000) : 999;
+                        newStreak = diffDays === 1 ? newStreak + 1 : 1;
+                    }
+
+                    const newXP = positive ? prev.xp + xpGain : prev.xp;
+
+                    // Update trust tier
+                    const actionLog = loadActionLog();
+                    const witnessed = actionLog.filter(a => a.witnessed).length;
+                    const total = actionLog.length + 1;
+                    const trustTier = (witnessed / total) > 0.5 ? 'high' : witnessed > 0 ? 'peer' : 'self';
+
+                    const newProfile = {
+                        ...prev, stats: newStats, xp: newXP,
+                        lastLogDate: now, streak: newStreak,
+                        carbonDebt: newDebt, trustTier,
+                        level: getLevelFromXP(newXP),
+                    };
+
+                    saveProfile(newProfile);
+
+                    // Save action log
+                    const newLog = [{ id: uuid(), timestamp: new Date().toISOString(), type, value: newStats[type], witnessed: false, photoHash }, ...actionLog.slice(0, 49)];
+                    saveActionLog(newLog);
+
+                    setEcoAnimKey(k => k + 1);
+
+                    callback({ xpGained: xpGain });
+                    return newProfile;
+                });
+            }, []);
+
+            const handleWitness = useCallback((karmaGain) => {
+                setProfile(prev => {
+                    const newProfile = { ...prev, karma: prev.karma + karmaGain };
+                    saveProfile(newProfile);
+                    showToastMsg(`+${karmaGain} Karma earned for witnessing! ✨`, '👀');
+                    return newProfile;
+                });
+            }, []);
+
+            return (
+                <div className={`app-shell${isDesktopMode ? ' desktop-mode' : ''}`}>
+                    <Header profile={profile} onScan={() => setShowScan(true)} isDesktopMode={isDesktopMode} toggleMode={() => setIsDesktopMode(!isDesktopMode)} />
+
+                    {tab === 'home' && <HomeScreen profile={profile} animKey={ecoAnimKey} onTale={() => setShowTale(true)} />}
+                    {tab === 'log' && <LogScreen profile={profile} onLog={handleLog} />}
+                    {tab === 'leaderboard' && <LeaderboardScreen profile={profile} />}
+
+                    <div className="bottom-nav">
+                        {[
+                            { id: 'home', icon: '🏠', label: 'Sanctuary' },
+                            { id: 'log', icon: '📝', label: 'Log' },
+                            { id: 'leaderboard', icon: '🏆', label: 'Rankings' },
+                        ].map(t => (
+                            <button key={t.id} className={`nav-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
+                                <span>{t.icon}</span>
+                                <span>{t.label}</span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {toast && <Toast msg={toast.msg} icon={toast.icon} />}
+                    {showTale && <TaleModal profile={profile} onClose={() => setShowTale(false)} />}
+                    {showScan && <ScanModal onClose={() => setShowScan(false)} onWitness={handleWitness} />}
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+
+</html>
